@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Italyancha Test</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #009246 33%, #ffffff 33%, #ffffff 66%, #ce2b37 66%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .container {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-cat {
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            padding: 8px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .btn-cat.active {
+            background-color: #009246;
+            color: white;
+            border-color: #009246;
+        }
+
+        .card {
+            background: #fdfdfd;
+            border: 2px solid #eee;
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .question-word {
+            font-size: 30px;
+            font-weight: bold;
+            color: #ce2b37;
+            margin: 10px 0 20px 0;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-option {
+            background: #fff;
+            border: 2px solid #e0e0e0;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-option:hover {
+            background: #f5f5f5;
+        }
+
+        .btn-option.correct {
+            background-color: #28a745 !important;
+            color: white !important;
+            border-color: #28a745 !important;
+        }
+
+        .btn-option.wrong {
+            background-color: #dc3545 !important;
+            color: white !important;
+            border-color: #dc3545 !important;
+        }
+
+        .feedback {
+            font-size: 20px;
+            font-weight: bold;
+            min-height: 30px;
+            margin-top: 15px;
+        }
+
+        .feedback.success { color: #28a745; }
+        .feedback.fail { color: #dc3545; }
+
+        .btn-next {
+            margin-top: 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: none;
+            width: 100%;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🇮🇹 Italyancha Test</h1>
+
+    <div class="categories">
+        <button class="btn-cat active" onclick="selectCategory('all', this)">🔄 Aralash</button>
+        <button class="btn-cat" onclick="selectCategory('mevalar', this)">🍎 Mevalar</button>
+        <button class="btn-cat" onclick="selectCategory('hayvonlar', this)">🐶 Hayvonlar</button>
+        <button class="btn-cat" onclick="selectCategory('tana', this)">🧠 Tana a'zolari</button>
+        <button class="btn-cat" onclick="selectCategory('oila', this)">👨‍👩‍👧 Oila</button>
+<button class="btn-cat" onclick="selectCategory('ranglar', this)">🎨 Ranglar</button>
+        <button class="btn-cat" onclick="selectCategory('kasblar', this)">👨‍🍳 Kasblar</button>
+        <button class="btn-cat" onclick="selectCategory('umumiy', this)">📚 Umumiy so'zlar</button>
+    </div>
+
+    <div class="card">
+        <div style="color: #666; font-size: 14px;">O'zbekcha tarjimasini toping:</div>
+        <div class="question-word" id="question">-</div>
+        
+        <div class="options" id="options"></div>
+
+        <div class="feedback" id="feedback"></div>
+        <button class="btn-next" id="next-btn" onclick="nextQuestion()">Keyingisi ➔</button>
+    </div>
+</div>
+
+<script>
+    const dictionary = [
+        // MEVALAR
+        { italian: "l'arancia", uzbek: "Apelsin", category: "mevalar" },
+        { italian: "il mandarino", uzbek: "Mandarina", category: "mevalar" },
+        { italian: "il limone", uzbek: "Limon", category: "mevalar" },
+        { italian: "il pompelmo", uzbek: "Greypfrut", category: "mevalar" },
+        { italian: "il lime", uzbek: "Laym", category: "mevalar" },
+        { italian: "la ciliegia", uzbek: "Gilos", category: "mevalar" },
+        { italian: "l'amarena", uzbek: "Olmabali (vishnya)", category: "mevalar" },
+        { italian: "la fragola", uzbek: "Qulupnay", category: "mevalar" },
+        { italian: "il lampone", uzbek: "Malina", category: "mevalar" },
+        { italian: "la mora", uzbek: "Maymunjon", category: "mevalar" },
+        { italian: "la pesca", uzbek: "Shaftoli", category: "mevalar" },
+        { italian: "la nettarina", uzbek: "Nektarin", category: "mevalar" },
+        { italian: "il ribes", uzbek: "Smorodina", category: "mevalar" },
+        { italian: "il ribes nero", uzbek: "Qora smorodina", category: "mevalar" },
+        { italian: "il mirtillo", uzbek: "Chernika", category: "mevalar" },
+        { italian: "l'albicocca", uzbek: "O'rik", category: "mevalar" },
+        { italian: "la mela", uzbek: "Olma", category: "mevalar" },
+        { italian: "la pera", uzbek: "Olmurut (nok)", category: "mevalar" },
+        { italian: "la prugna", uzbek: "Olxo'ri", category: "mevalar" },
+        { italian: "l'uva", uzbek: "Uzum", category: "mevalar" },
+        { italian: "il cocomero", uzbek: "Tarvuz", category: "mevalar" },
+        { italian: "il melone", uzbek: "Qovun", category: "mevalar" },
+        { italian: "l'avocado", uzbek: "Avokado", category: "mevalar" },
+        { italian: "la banana", uzbek: "Banan", category: "mevalar" },
+        { italian: "l'ananas", uzbek: "Ananas", category: "mevalar" },
+        { italian: "il cachi", uzbek: "Hurmo", category: "mevalar" },
+        { italian: "il mango", uzbek: "Mango", category: "mevalar" },
+        { italian: "la melagrana", uzbek: "Anor", category: "mevalar" },
+        { italian: "la noce di cocco", uzbek: "Kokos", category: "mevalar" },
+        { italian: "il kiwi", uzbek: "Kivi", category: "mevalar" },
+        { italian: "il fico", uzbek: "Anjir", category: "mevalar" },
+        { italian: "la mela cotogna", uzbek: "Behi", category: "mevalar" },
+        { italian: "la papaya", uzbek: "Papaya", category: "mevalar" },
+
+        // HAYVONLAR
+        { italian: "il cane", uzbek: "It", category: "hayvonlar" },
+        { italian: "il gatto", uzbek: "Mushuk", category: "hayvonlar" },
+        { italian: "il coniglio", uzbek: "Quyon", category: "hayvonlar" },
+        { italian: "il criceto", uzbek: "Xomyak", category: "hayvonlar" },
+        { italian: "il pesce", uzbek: "Baliq", category: "hayvonlar" },
+        { italian: "la mucca", uzbek: "Sigir", category: "hayvonlar" },
+        { italian: "il toro", uzbek: "Ho'kiz", category: "hayvonlar" },
+        { italian: "il vitello", uzbek: "Buzoq", category: "hayvonlar" },
+        { italian: "il maiale", uzbek: "Cho'chqa", category: "hayvonlar" },
+{ italian: "la pecora", uzbek: "Qo'y", category: "hayvonlar" },
+        { italian: "la capra", uzbek: "Echki", category: "hayvonlar" },
+        { italian: "il cavallo", uzbek: "Ot", category: "hayvonlar" },
+        { italian: "l'asino", uzbek: "Eshak", category: "hayvonlar" },
+        { italian: "la gallina", uzbek: "Tovuq", category: "hayvonlar" },
+        { italian: "il gallo", uzbek: "Xo'roz", category: "hayvonlar" },
+        { italian: "il leone", uzbek: "Arslon", category: "hayvonlar" },
+        { italian: "la tigre", uzbek: "Yo'lbars", category: "hayvonlar" },
+        { italian: "l'elefante", uzbek: "Fil", category: "hayvonlar" },
+        { italian: "la giraffa", uzbek: "Jirafa", category: "hayvonlar" },
+        { italian: "il lupo", uzbek: "Bo'ri", category: "hayvonlar" },
+        { italian: "la scimmia", uzbek: "Maymun", category: "hayvonlar" },
+        { italian: "il gorilla", uzbek: "Gorilla", category: "hayvonlar" },
+        { italian: "il leopardo", uzbek: "Leopard", category: "hayvonlar" },
+        { italian: "la zebra", uzbek: "Zebra", category: "hayvonlar" },
+        { italian: "l'ippopotamo", uzbek: "Begemot", category: "hayvonlar" },
+        { italian: "l'orso", uzbek: "Ayiq", category: "hayvonlar" },
+        { italian: "la volpe", uzbek: "Tulki", category: "hayvonlar" },
+        { italian: "il cervo", uzbek: "Kiyik", category: "hayvonlar" },
+        { italian: "lo scoiattolo", uzbek: "Olmaxon", category: "hayvonlar" },
+
+        // TANA A'ZOLARI
+        { italian: "la testa", uzbek: "Bosh", category: "tana" },
+        { italian: "i capelli", uzbek: "Soch", category: "tana" },
+        { italian: "il fronte", uzbek: "Peshona", category: "tana" },
+        { italian: "il naso", uzbek: "Burun", category: "tana" },
+        { italian: "la bocca", uzbek: "Og'iz", category: "tana" },
+        { italian: "il collo", uzbek: "Bo'yin", category: "tana" },
+        { italian: "la mano", uzbek: "Qo'l", category: "tana" },
+        { italian: "il dito", uzbek: "Barmoq", category: "tana" },
+        { italian: "la spalla", uzbek: "Yelka", category: "tana" },
+
+        // OILA
+        { italian: "la madre", uzbek: "Ona", category: "oila" },
+        { italian: "il padre", uzbek: "Ota", category: "oila" },
+        { italian: "la sorella", uzbek: "Singil / Opa", category: "oila" },
+        { italian: "il fratello", uzbek: "Aka / Uka", category: "oila" },
+        { italian: "il nonno", uzbek: "Bobo", category: "oila" },
+        { italian: "la nonna", uzbek: "Buvi", category: "oila" },
+
+        // RANGLAR
+        { italian: "bianco", uzbek: "Oq", category: "ranglar" },
+        { italian: "nero", uzbek: "Qora", category: "ranglar" },
+        { italian: "rosa", uzbek: "Pushti", category: "ranglar" },
+        { italian: "rosso", uzbek: "Qizil", category: "ranglar" },
+        { italian: "blu", uzbek: "Ko'k", category: "ranglar" },
+        { italian: "verde", uzbek: "Yashil", category: "ranglar" },
+        { italian: "giallo", uzbek: "Sariq", category: "ranglar" },
+
+        // KASBLAR
+        { italian: "il dottore", uzbek: "Shifokor", category: "kasblar" },
+        { italian: "l'insegnante", uzbek: "O'qituvchi", category: "kasblar" },
+        { italian: "il cuoco", uzbek: "Oshpaz", category: "kasblar" },
+        { italian: "il pilota", uzbek: "Uchuvchi", category: "kasblar" },
+
+        // UMUMIY
+        { italian: "la casa", uzbek: "Uy", category: "umumiy" },
+        { italian: "il paese", uzbek: "Davlat", category: "umumiy" },
+        { italian: "la sedia", uzbek: "Stul", category: "umumiy" },
+        { italian: "il treno", uzbek: "Poyezd", category: "umumiy" },
+        { italian: "la finestra", uzbek: "Deraza", category: "umumiy" }
+    ];
+
+    let currentCategory = 'all';
+    let filteredWords = [];
+    let currentQuestion = null;
+    let isAnswered = false;
+
+    function selectCategory(cat, btn) {
+        currentCategory = cat;
+        document.querySelectorAll('.btn-cat').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        initQuiz();
+    }
+function initQuiz() {
+        if (currentCategory === 'all') {
+            filteredWords = [...dictionary];
+        } else {
+            filteredWords = dictionary.filter(w => w.category === currentCategory);
+        }
+        nextQuestion();
+    }
+
+    function nextQuestion() {
+        isAnswered = false;
+        document.getElementById('feedback').innerText = '';
+        document.getElementById('feedback').className = 'feedback';
+        document.getElementById('next-btn').style.display = 'none';
+
+        if (filteredWords.length === 0) {
+            document.getElementById('question').innerText = "Savollar tugadi!";
+            document.getElementById('options').innerHTML = '';
+            return;
+        }
+
+        const randomIndex = Math.floor(Math.random() * filteredWords.length);
+        currentQuestion = filteredWords[randomIndex];
+
+        document.getElementById('question').innerText = currentQuestion.italian;
+
+        let allUzbekWords = [...new Set(dictionary.map(d => d.uzbek))];
+        let wrongOptions = allUzbekWords.filter(w => w !== currentQuestion.uzbek);
+        
+        wrongOptions.sort(() => 0.5 - Math.random());
+        let options = wrongOptions.slice(0, 3);
+        options.push(currentQuestion.uzbek);
+        options.sort(() => 0.5 - Math.random());
+
+        const optionsContainer = document.getElementById('options');
+        optionsContainer.innerHTML = '';
+        
+        options.forEach(option => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-option';
+            btn.innerText = option;
+            btn.onclick = function() { checkAnswer(option, btn); };
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selectedOption, btn) {
+        if (isAnswered) return;
+        isAnswered = true;
+
+        const feedbackEl = document.getElementById('feedback');
+        const allButtons = document.querySelectorAll('.btn-option');
+
+        if (selectedOption === currentQuestion.uzbek) {
+            btn.classList.add('correct');
+            feedbackEl.innerText = "Bravo! Zo'r! 👏 Perfetto!";
+            feedbackEl.classList.add('success');
+        } else {
+            btn.classList.add('wrong');
+            feedbackEl.innerText = "Ehhh😔 To'g'ri javob: " + currentQuestion.uzbek;
+            feedbackEl.classList.add('fail');
+
+            allButtons.forEach(b => {
+                if (b.innerText === currentQuestion.uzbek) {
+                    b.classList.add('correct');
+                }
+            });
+        }
+
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    // Dasturni yurgizish
+    initQuiz();
+</script>
+
+</body>
+</html>
